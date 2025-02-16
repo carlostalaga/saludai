@@ -4,6 +4,7 @@ from modules.translation import extract_and_translate
 from modules.moderation import moderate_content
 from modules.fact_check import fact_check_translation
 from modules.seo import generate_seo_title, generate_excerpt, assign_category
+from modules.thumbnail import generate_thumbnail
 from modules.wordpress import publish_to_wordpress, map_category_to_id  # Ensure correct import
 
 import sys
