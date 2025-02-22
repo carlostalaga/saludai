@@ -1,8 +1,10 @@
+# seo.py
+
 import openai
+from config import get_openai_api_key
 
-openai.api_key = "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"
-
-client = openai.OpenAI(api_key=openai.api_key)
+# Set the OpenAI API key
+openai.api_key = get_openai_api_key()
 
 def generate_seo_title(content):
     """Generates an SEO-friendly article title based on the translated content, max 60 characters."""

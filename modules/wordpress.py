@@ -1,11 +1,16 @@
+# wordpress.py
+
 import requests
 from requests.auth import HTTPBasicAuth
 from modules.thumbnail import generate_thumbnail
+from config import get_wordpress_credentials
 
-WP_URL = "https://guiacirugiaestetica.com/wp-json/wp/v2/posts"
-MEDIA_URL = "https://guiacirugiaestetica.com/wp-json/wp/v2/media"
-WP_USER = "dev"  # Your WordPress admin username
-WP_APP_PASSWORD = "W6sb rzY1 s9rS SsCi NAj0 Y75l"
+# Retrieve WordPress credentials and URLs
+credentials = get_wordpress_credentials()
+WP_URL = credentials["wp_url"]
+MEDIA_URL = credentials["media_url"]
+WP_USER = credentials["wp_user"]
+WP_APP_PASSWORD = credentials["wp_app_password"]
 
 def upload_thumbnail(image_url):
     """Downloads the image and uploads it to WordPress as a media attachment."""
@@ -52,7 +57,7 @@ def publish_to_wordpress(title, content, excerpt, category_id):
         "content": content,
         "status": "publish",
         "excerpt": excerpt,
-        "categories": [category_id] if category_id else [],
+        # "categories": [category_id] if category_id else [],
         "featured_media": media_id  # ✅ Attach the uploaded image as the featured thumbnail
     }
 
