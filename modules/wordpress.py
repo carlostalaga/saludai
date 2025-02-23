@@ -73,3 +73,33 @@ def publish_to_wordpress(title, content, excerpt, category_id):
         print(f"📌 View Post: {response.json()['link']}")
     else:
         print(f"❌ Failed to publish: {response.json()}")
+
+
+
+
+
+def map_category_to_id(category_name):
+    """
+    Maps a category name to its corresponding WordPress category ID.
+    """
+    categories_url = f"{WP_URL}/categories"
+    auth = HTTPBasicAuth(WP_USER, WP_APP_PASSWORD)
+    response = requests.get(categories_url, auth=auth)
+
+    if response.status_code == 200:
+        categories = response.json()
+        for category in categories:
+            if category['name'].lower() == category_name.lower():
+                return category['id']
+        # If category does not exist, create it
+        new_category = {'name': category_name}
+        create_response = requests.post(categories_url, json=new_category, auth=auth)
+        if create_response.status_code == 201:
+            created_category = create_response.json()
+            return created_category['id']
+        else:
+            print(f"❌ Error: Failed to create category '{category_name}'.")
+            return None
+    else:
+        print("❌ Error: Failed to fetch categories from WordPress.")
+        return None
