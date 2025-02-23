@@ -1,12 +1,11 @@
 # thumbnail.py
 
 import requests
-
-import openai
 from config import get_openai_api_key
+from openai import OpenAI
 
-# Set the OpenAI API key
-openai.api_key = get_openai_api_key()
+# Create the OpenAI client instance with your API key
+client = OpenAI(api_key=get_openai_api_key())
 
 IMAGE_PROMPT = (
     "A soft, pastel-colored abstract painting with smooth gradients and gentle brushstrokes. "
@@ -19,15 +18,18 @@ IMAGE_PROMPT = (
 )
 
 def generate_thumbnail():
-    """Generates a 1280x600 px abstract science-inspired thumbnail."""
+    """
+    Generates an abstract science-inspired thumbnail
+    using an OpenAI image generation endpoint.
+    """
     try:
-        response = openai.Image.create(
-            model="dall-e-3",  # Ensure DALL-E 3 is supported in your API access
+        response = client.images.generate(
+            model="dall-e-3",  # Ensure your account has access to DALL-E 3
             prompt=IMAGE_PROMPT,
-            size="1280x600"
+            size="1792x1024"
         )
-        
-        image_url = response["data"][0]["url"]
+
+        image_url = response.data[0].url
         return image_url  # ✅ Returns the generated image URL
 
     except Exception as e:

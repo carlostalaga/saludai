@@ -7,14 +7,20 @@ from dotenv import load_dotenv
 load_dotenv()
 
 def get_openai_api_key():
-    """Retrieve the OpenAI API key from environment variables."""
+    """
+    Retrieve the OpenAI API key from environment variables.
+    Raises an error if OPENAI_API_KEY is not found.
+    """
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         raise ValueError("OPENAI_API_KEY is not set in the environment variables.")
     return api_key
 
 def get_wordpress_credentials():
-    """Retrieve WordPress credentials and URLs from environment variables."""
+    """
+    Retrieve WordPress credentials and URLs from environment variables.
+    Raises an error if any are missing.
+    """
     wp_url = os.getenv("WP_URL")
     media_url = os.getenv("MEDIA_URL")
     wp_user = os.getenv("WP_USER")

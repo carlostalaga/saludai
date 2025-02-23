@@ -1,27 +1,41 @@
-#fact_check.py
+# fact_check.py
 
-import openai
 from config import get_openai_api_key
+from openai import OpenAI
 
-# Set the OpenAI API key
-openai.api_key = get_openai_api_key()
+client = OpenAI(api_key=get_openai_api_key())
 
 def fact_check_translation(original_text, translated_text):
-    """AI compares its own translation with the original to ensure factual accuracy."""
+    """
+    AI compares the Spanish translation with the original English text
+    and returns a final, fact-checked Spanish version (no English summary).
+    """
+
     response = client.chat.completions.create(
-        model="gpt-4o",
+        model="gpt-4",
         messages=[
-            {"role": "system", "content": 
-                "Compare the following two texts. The first is in English (original), and the second is in Spanish (translated). "
-                "Ensure the Spanish version correctly reflects the English version while maintaining the translation. "
-                "Do NOT rewrite or translate the Spanish version back into English. "
-                "Check for any factual inconsistencies, missing details, or hallucinated information. "
-                "Ensure the translation remains accurate and fact-based, without exaggerations or omissions. "
-                "Only make factual corrections while keeping the final output in Spanish."
-                "Remove any part of other articles or advertising that may have been included in the translation."
+            {
+                "role": "system",
+                "content": (
+                    "You are verifying a Spanish translation of an English text. "
+                    "You will receive two versions: first the English (original), then the Spanish (translated). "
+                    "Perform a side-by-side comparison for factual accuracy, missing details, or hallucinations. "
+                    "Your final output must be the corrected Spanish text ONLY, preserving paragraphs and structure. "
+                    "Do not include commentary or summary in English. "
+                    "Do not re-translate everything back to English. "
+                    "If the Spanish text is already fully accurate, return it verbatim. "
+                    "Otherwise, make only minimal corrections in Spanish where you find factual or translational errors."
+                )
             },
-            {"role": "user", "content": f"Original: {original_text} \n\n Translation: {translated_text}"}
-        ]
+            {
+                "role": "user",
+                "content": (
+                    f"**Original (English)**:\n{original_text}\n\n"
+                    f"**Translated (Spanish)**:\n{translated_text}"
+                )
+            }
+        ],
     )
 
-    return response.choices[0].message.content  # ✅ No incorrect unpacking
+    # This should now be purely Spanish text (with minimal corrections).
+    return response.choices[0].message.content
