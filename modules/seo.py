@@ -6,27 +6,6 @@ from openai import OpenAI
 # Create the OpenAI client instance with your API key
 client = OpenAI(api_key=get_openai_api_key())
 
-def generate_seo_title(content):
-    """
-    Generates an SEO-friendly article title based on the translated content, max 60 characters.
-    """
-    response = client.chat.completions.create(
-        model="gpt-4",
-        messages=[
-            {
-                "role": "system",
-                "content": (
-                    "Generate a compelling SEO-friendly article title based on the following text. "
-                    "Keep it under 60 characters while keeping it engaging and keyword-rich."
-                )
-            },
-            {"role": "user", "content": content}
-        ],
-    )
-    # Ensure the title does not exceed 60 characters
-    seo_title = response.choices[0].message.content.strip()
-    return seo_title[:60]
-
 def generate_excerpt(content):
     """
     Creates a short excerpt (meta description) for SEO and previews.

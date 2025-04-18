@@ -29,16 +29,16 @@ def upload_thumbnail(image_url):
 
         image_data = response.content
         headers = {
-            "Content-Disposition": "attachment; filename=thumbnail.jpg",
+            "Content-Disposition": "attachment; filename=thumbnail.png",  # Changed filename to .png
             "Authorization": f"Basic {WP_USER}:{WP_APP_PASSWORD}",
-            "Content-Type": "image/jpeg"
+            "Content-Type": "image/png"  # Changed Content-Type to image/png
         }
 
         media_response = requests.post(
             MEDIA_URL,
             auth=HTTPBasicAuth(WP_USER, WP_APP_PASSWORD),
             headers=headers,
-            files={'file': ('thumbnail.jpg', image_data, 'image/jpeg')}
+            files={'file': ('thumbnail.png', image_data, 'image/png')} # Changed filename and type in files dict
         )
 
         if media_response.status_code == 201:
