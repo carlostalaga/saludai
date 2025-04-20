@@ -7,6 +7,8 @@ import re
 # Create the OpenAI client instance with your API key
 client = OpenAI(api_key=get_openai_api_key())
 
+# Removed split_long_paragraph function
+
 def format_content_as_html(text):
     """
     Takes plain text content, identifies the main title (likely the first significant heading),
@@ -57,6 +59,8 @@ def format_content_as_html(text):
         formatted_body = re.sub(r"<h1.*?>.*?</h1>", "", formatted_body, count=1, flags=re.IGNORECASE | re.DOTALL).strip()
     else:
         actual_title = potential_title # Use the initial guess if no H1 found/removed
+
+    # --- Removed paragraph splitting logic ---
 
     # Clean up potential leading/trailing whitespace artifacts
     formatted_body = formatted_body.strip()
