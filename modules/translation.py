@@ -1,6 +1,6 @@
 # translation.py
 
-from config import get_openai_api_key
+from config import get_openai_api_key, get_model_for_module
 from openai import OpenAI
 import requests
 from bs4 import BeautifulSoup
@@ -71,10 +71,10 @@ def extract_original_text(url):
 
 def extract_and_translate(text):
     """
-    Translates the provided text using GPT-4.
-    Keeps factual integrity and structure intact.
-    Handles the first occurrence of technical terms specially via prompt.
+    Translates the provided text using the preferred GPT model for translation.
     """
+    model = get_model_for_module("translation")
+
     # 1. Split the text
     chunks = split_text(text)
     translated_chunks = []
@@ -90,22 +90,36 @@ def extract_and_translate(text):
         "Ensure the translation is accurate, professional, and informative. "
         "Cite sources where necessary. "
         "Credit authors and publications where applicable. \n\n"
+        "--- IMPORTANT RULE FOR REFERENCES AND CITATIONS ---\n"
+        "Remove ALL references to footnotes, endnotes, or citations in square brackets [86], parentheses (86), or similar formats. "
+        "DO NOT include any of these reference markers in your translation. Simply translate the content without "
+        "these citation markers. For example, \"This is a fact [82].\" should be translated as just \"This is a fact.\" in Spanish.\n\n"
         "--- IMPORTANT RULE FOR TECHNICAL TERMS WITH ACRONYMS ---\n"
-        "When you encounter a technical term in English that has an acronym (like 'Machine Learning (ML)' or 'Convolutional Neural Networks (CNN)'), follow this specific rule for the *very first time* you translate it into Spanish within the entire article (not just this chunk):\n"
-        "1. Write the original English term and its acronym exactly as it appears in the source.\n"
-        "2. Add the Spanish phrase ' o ' (meaning 'or').\n"
-        "3. Add the Spanish translation enclosed in single quotes ('').\n"
-        "Example: The first time 'Machine Learning (ML)' appears, translate it as: Machine Learning (ML) o 'Aprendizaje Automático'.\n"
-        "Example: The first time 'Convolutional Neural Networks (CNN)' appears, translate it as: Convolutional Neural Networks (CNN) o 'Redes Neuronales Convolucionales'.\n"
-        "For *all subsequent* mentions of the same term (even in later chunks), use *only* the Spanish translation (e.g., 'Aprendizaje Automático') or just the acronym (e.g., 'ML'), whichever fits the context better. Do NOT repeat the English term after the first mention.\n"
-        "--- END OF RULE ---"
+        "Pay close attention to technical terms presented in the format 'Full Name (ACRONYM)' or 'Full Name (ACRONYMs)', like 'Artificial Intelligence (AI)' or 'Large Language Models (LLMs)'.\n"
+        "When you encounter such a technical term in English with its acronym, follow these rules strictly:\n"
+        "1. ALWAYS keep the acronym exactly as it appears in the original English text. Never translate acronyms.\n"
+        "2. For the mention of a technical term with an acronym:\n"
+        "   a. Write the Spanish translation of the full name.\n"
+        "   b. Immediately after the Spanish translation, add parentheses containing:\n"
+        "      i. The original English full name.\n"
+        "      ii. A space, a hyphen, and another space (' - ').\n"
+        "      iii. The original English acronym.\n"
+        "   Example: when 'Machine Learning (ML)' appears, translate it as: Aprendizaje Automático (Machine Learning - ML).\n"
+        "   Example: when 'Convolutional Neural Networks (CNN)' appears, translate it as: Redes Neuronales Convolucionales (Convolutional Neural Networks - CNN).\n"
+        "   Example: when 'Large Language Models (LLMs)' appears, translate it as: Modelos Lingüísticos Grandes (Large Language Models - LLMs).\n"
+        "   Example: when 'Artificial Intelligence (AI)' appears, translate it as: Inteligencia Artificial (Artificial Intelligence - AI).\n"
+        "3. NEVER translate the acronym itself - 'ML' must remain 'ML', not 'AA'.\n"
+        "4. If the rules are not followed, the output will be considered invalid.\n"
+        "--- END OF RULES ---"
     )
 
     # 2. Translate chunk by chunk
-    for chunk in chunks:
+    print(f"ℹ️ Text length: {len(text)} characters. Splitting into {len(chunks)} chunks.") # Added info
+    for i, chunk in enumerate(chunks): # Added enumerate for index
         try:
+            print(f"⚙️ Processing translation chunk {i+1}/{len(chunks)}...") # Added print statement
             response = client.chat.completions.create(
-                model="gpt-4",
+                model=model,
                 messages=[
                     {
                         "role": "system",
@@ -117,9 +131,9 @@ def extract_and_translate(text):
             translated_text = response.choices[0].message.content
             translated_chunks.append(translated_text)
         except Exception as e:
-            print(f"Error during translation chunk: {e}")
+            print(f"❌ Error during translation chunk {i+1}: {e}") # Updated error message
             # Optionally append original chunk or handle error
-            translated_chunks.append(f"[Translation Error: {chunk[:100]}...]" )
+            translated_chunks.append(f"[Translation Error in chunk {i+1}]" ) # Updated error placeholder
 
     # 3. Combine all translated chunks
     full_translation = "\n\n".join(translated_chunks)

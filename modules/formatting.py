@@ -1,6 +1,6 @@
 # formatting.py
 
-from config import get_openai_api_key
+from config import get_openai_api_key, get_model_for_module
 from openai import OpenAI
 import re
 
@@ -11,18 +11,17 @@ client = OpenAI(api_key=get_openai_api_key())
 
 def format_content_as_html(text):
     """
-    Takes plain text content, identifies the main title (likely the first significant heading),
-    formats the rest of the content using appropriate HTML tags (e.g., <h2>, <p>, <ul>, <li>)
-    for better readability on a webpage, excluding the main title from the body.
-    Returns the extracted title and the formatted HTML body separately.
+    Formats content as HTML using the preferred GPT model for formatting.
     """
+    model = get_model_for_module("formatting")
+
     # First, try to extract a plausible title from the beginning of the text
     # This is a simple heuristic, assuming the title is the first line or heading.
     lines = text.strip().split('\n')
     potential_title = lines[0].strip() if lines else "Untitled Article" # Default title
 
     response = client.chat.completions.create(
-        model="gpt-4",
+        model=model,
         messages=[
             {
                 "role": "system",

@@ -1,6 +1,6 @@
 # fact_check.py
 
-from config import get_openai_api_key
+from config import get_openai_api_key, get_model_for_module
 from openai import OpenAI
 
 client = OpenAI(api_key=get_openai_api_key())
@@ -10,9 +10,10 @@ def fact_check_translation(original_text, translated_text):
     AI compares the Spanish translation with the original English text
     and returns a final, fact-checked Spanish version (no English summary).
     """
+    model = get_model_for_module("fact_check") # Use the function to get the model
 
     response = client.chat.completions.create(
-        model="gpt-4",
+        model=model, # Use the dynamically selected model
         messages=[
             {
                 "role": "system",

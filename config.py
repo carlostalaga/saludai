@@ -35,3 +35,17 @@ def get_wordpress_credentials():
         "wp_user": wp_user,
         "wp_app_password": wp_app_password
     }
+
+def get_model_for_module(module_name):
+    """
+    Retrieve the preferred OpenAI model for a given module.
+    """
+    model_mapping = {
+        "translation": "gpt-4",
+        "moderation": "gpt-4",
+        "fact_check": "gpt-4",
+        "formatting": "gpt-3.5-turbo",
+        "seo": "gpt-3.5-turbo",
+        # Note: thumbnail.py uses DALL-E (client.images.generate), not a GPT chat model.
+    }
+    return model_mapping.get(module_name, "gpt-3.5-turbo")  # Default to gpt-3.5-turbo
