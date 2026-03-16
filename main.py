@@ -12,7 +12,7 @@ from modules.translation import extract_and_translate, extract_original_text
 from modules.moderation import moderate_content
 from modules.fact_check import fact_check_translation
 # from modules.seo import generate_seo_title # No longer needed
-from modules.seo import generate_excerpt, assign_category # Keep other SEO functions
+from modules.seo import generate_seo_data # Combined excerpt + category in one call
 from modules.formatting import format_content_as_html # Import the updated formatting function
 from modules.thumbnail import generate_thumbnail  # Temporarily disable if you want to skip images
 from modules.wordpress import publish_to_wordpress, map_category_to_id
@@ -49,6 +49,13 @@ if DEBUG:
 # Pass the original_text directly to the translation function
 translated_text = extract_and_translate(original_text)
 
+# Fail fast: abort if all translation chunks failed to avoid burning tokens on bad content
+if not translated_text.strip() or all(
+    f"[Translation Error" in line for line in translated_text.splitlines() if line.strip()
+):
+    print("❌ Translation failed entirely. Aborting to avoid wasting tokens on downstream steps.")
+    sys.exit(1)
+
 if DEBUG:
     print("[DEBUG STEP 1: TRANSLATE] Translated text (first 500 chars):")
     print(translated_text[:500])
@@ -77,9 +84,8 @@ if DEBUG:
 # -----------------------------------------------------------------
 # STEP 4: SEO (Excerpt and Category only)
 # -----------------------------------------------------------------
-# seo_title = generate_seo_title(final_checked_text) # Removed
-excerpt = generate_excerpt(final_checked_text)
-category_name = assign_category(final_checked_text)
+# Single API call for both excerpt and category (truncated input — saves tokens)
+excerpt, category_name = generate_seo_data(final_checked_text)
 category_id = map_category_to_id(category_name)
 
 if DEBUG:

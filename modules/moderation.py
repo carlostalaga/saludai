@@ -83,29 +83,32 @@ def moderate_content(text):
         # Combine all moderated chunks
         return "\n\n".join(moderated_chunks)
     else:
-        # For shorter texts, process as before
-        response = client.chat.completions.create(
-            model=model,
-            messages=[
-                {
-                    "role": "system",
-                    "content": (
-                        "You are reviewing a Spanish medical article that was originally translated from English. "
-                        "Your task is to ensure factual accuracy without altering the Spanish language or rewriting content. "
-                        "Retain the Spanish text exactly as is—preserve structure, paragraphs, headings, and style. "
-                        "Remove or mark (with minimal changes) any hallucinations, fabricated claims, or misleading medical information "
-                        "that was not in the original text. "
-                        "If a medical claim lacks proper attribution or references, clearly label it as an expert opinion rather than established fact. "
-                        "Do not summarize, do not revert to English, and do not omit any valid text. "
-                        "Return only the updated Spanish text, with minimal necessary edits to questionable sections. "
-                        "If everything is valid, simply return the text unchanged."
-                    )
-                },
-                {
-                    "role": "user",
-                    "content": text
-                }
-            ],
-        )
-
-        return response.choices[0].message.content
+        # For shorter texts, process in a single call
+        try:
+            response = client.chat.completions.create(
+                model=model,
+                messages=[
+                    {
+                        "role": "system",
+                        "content": (
+                            "You are reviewing a Spanish medical article that was originally translated from English. "
+                            "Your task is to ensure factual accuracy without altering the Spanish language or rewriting content. "
+                            "Retain the Spanish text exactly as is—preserve structure, paragraphs, headings, and style. "
+                            "Remove or mark (with minimal changes) any hallucinations, fabricated claims, or misleading medical information "
+                            "that was not in the original text. "
+                            "If a medical claim lacks proper attribution or references, clearly label it as an expert opinion rather than established fact. "
+                            "Do not summarize, do not revert to English, and do not omit any valid text. "
+                            "Return only the updated Spanish text, with minimal necessary edits to questionable sections. "
+                            "If everything is valid, simply return the text unchanged."
+                        )
+                    },
+                    {
+                        "role": "user",
+                        "content": text
+                    }
+                ],
+            )
+            return response.choices[0].message.content
+        except Exception as e:
+            print(f"❌ Moderation error: {e}. Keeping original text unchanged.")
+            return text
