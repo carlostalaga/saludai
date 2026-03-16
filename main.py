@@ -23,9 +23,12 @@ DEBUG = True
 # Ensure a URL is provided
 if len(sys.argv) < 2:
     print("❌ Error: Please provide a URL to process.")
+    print("Usage: python main.py <url_or_text> [--dry-run]")
     sys.exit(1)
 
-url_or_text = sys.argv[1]
+# --dry-run flag: run all processing steps but skip WordPress publishing
+DRY_RUN = "--dry-run" in sys.argv
+url_or_text = next(arg for arg in sys.argv[1:] if arg != "--dry-run")
 
 # -----------------------------------------------------------------
 # STEP 0: DEBUG/VERIFICATION BEFORE PROCEEDING
@@ -108,8 +111,13 @@ if DEBUG:
 # -----------------------------------------------------------------
 # STEP 5: PUBLISH
 # -----------------------------------------------------------------
-# Pass the extracted title and the formatted HTML body (without title) to WordPress
-publish_to_wordpress(article_title, formatted_html_body, excerpt, category_id)
-
-print(f"✅ Process completed successfully! Published with title: {article_title}") # Updated print statement
-print(f"📌 Assigned Category: {category_name} (ID: {category_id})")
+if DRY_RUN:
+    print("\n🧪 DRY RUN — skipping WordPress publish.")
+    print(f"📰 Title: {article_title}")
+    print(f"📝 Excerpt: {excerpt}")
+    print(f"📌 Category: {category_name} (ID: {category_id})")
+    print(f"\n--- HTML Body (first 1000 chars) ---\n{formatted_html_body[:1000]}\n...[truncated]...")
+else:
+    publish_to_wordpress(article_title, formatted_html_body, excerpt, category_id)
+    print(f"✅ Process completed successfully! Published with title: {article_title}")
+    print(f"📌 Assigned Category: {category_name} (ID: {category_id})")

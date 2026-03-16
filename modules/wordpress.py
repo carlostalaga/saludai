@@ -144,7 +144,11 @@ def publish_to_wordpress(title, content, excerpt, category_id):
         print(f"✅ Successfully published! Post ID: {json_resp['id']}")
         print(f"📌 View Post: {json_resp['link']}")
     else:
-        print(f"❌ Failed to publish: {response.json()}")
+        print(f"❌ Failed to publish. Status: {response.status_code}")
+        try:
+            print(f"❌ Error details: {response.json()}")
+        except Exception:
+            print(f"❌ Response was not JSON (first 300 chars): {response.text[:300]}")
 
 def map_category_to_id(category_name):
     """
