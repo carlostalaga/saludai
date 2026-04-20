@@ -46,6 +46,6 @@ def get_model_for_module(module_name):
         "fact_check": "gpt-4o",
         "formatting": "gpt-4o-mini",
         "seo": "gpt-4o-mini",
-        # Note: thumbnail.py uses DALL-E (client.images.generate), not a GPT chat model.
+        # Note: thumbnail.py uses gpt-image-1-mini (client.images.generate), not a GPT chat model.
     }
     return model_mapping.get(module_name, "gpt-4o-mini")  # Default to gpt-4o-mini

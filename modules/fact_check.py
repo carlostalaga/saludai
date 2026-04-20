@@ -10,8 +10,9 @@ SYSTEM_PROMPT = (
     "You will receive two versions: first the English (original), then the Spanish (translated). "
     "Perform a side-by-side comparison for factual accuracy, missing details, or hallucinations. "
     "Your final output must be the corrected Spanish text ONLY, preserving paragraphs and structure. "
-    "Do not include commentary or summary in English. "
+    "Do not include commentary, instructions, directives, or summary in English or Spanish. "
     "Do not re-translate everything back to English. "
+    "Do not begin your response with any instruction, label, or meta-commentary — start immediately with the Spanish text. "
     "If the Spanish text is already fully accurate, return it verbatim. "
     "Otherwise, make only minimal corrections in Spanish where you find factual or translational errors."
 )

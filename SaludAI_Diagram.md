@@ -56,7 +56,7 @@
                v
 +--------------------------------+
 |  STEP 5: THUMBNAIL GENERATION  |
-|  - Generate image using DALL-E |
+|  - Generate image using gpt-image-1-mini |
 |  - Download generated image    |
 +--------------------------------+
                |
@@ -97,7 +97,7 @@
 - **OpenAI Integration**:
   - GPT-4 (translation, moderation, fact-check)
   - GPT-3.5-Turbo (formatting, SEO)
-  - DALL-E (thumbnail generation)
+  - gpt-image-1-mini (thumbnail generation)
 
 - **Web Technologies**:
   - WordPress API (publishing)
@@ -118,7 +118,7 @@
 5. **Fact Checking**: Translated content is verified against original
 6. **SEO Processing**: Excerpt generated and category assigned
 7. **Formatting**: Content formatted as HTML with title extraction
-8. **Image Generation**: Thumbnail created using DALL-E
+8. **Image Generation**: Thumbnail created using gpt-image-1-mini
 9. **Publishing**: Content published to WordPress with metadata and thumbnail
 
 ## Implementation Details

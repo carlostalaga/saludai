@@ -48,6 +48,9 @@ def format_content_as_html(text):
 
     formatted_body = response.choices[0].message.content.strip()
 
+    # Strip markdown code fences if the model wrapped output in ```html ... ```
+    formatted_body = re.sub(r'^```[a-zA-Z]*\n?', '', formatted_body).rstrip('`').strip()
+
     # Attempt to extract a more definitive title if the initial guess was poor
     # or if the LLM included an H1 despite instructions.
     # We prioritize an H1 tag if found, otherwise stick to the initial guess.
@@ -58,6 +61,9 @@ def format_content_as_html(text):
         formatted_body = re.sub(r"<h1.*?>.*?</h1>", "", formatted_body, count=1, flags=re.IGNORECASE | re.DOTALL).strip()
     else:
         actual_title = potential_title # Use the initial guess if no H1 found/removed
+
+    # Strip markdown bold/italic markers from the title (e.g. **Title** → Title)
+    actual_title = re.sub(r'\*{1,3}(.*?)\*{1,3}', r'\1', actual_title).strip()
 
     # --- Removed paragraph splitting logic ---
 

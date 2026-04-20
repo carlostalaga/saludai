@@ -24,9 +24,9 @@ def generate_thumbnail():
     """
     try:
         response = client.images.generate(
-            model="dall-e-3",  # Ensure your account has access to DALL-E 3
+            model="gpt-image-1-mini",
             prompt=IMAGE_PROMPT,
-            size="1792x1024"
+            size="1536x1024"
         )
 
         image_url = response.data[0].url

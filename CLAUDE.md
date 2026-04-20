@@ -29,7 +29,7 @@ Input (URL or raw text)
   → fact_check_translation()      [gpt-4o]        modules/fact_check.py
   → generate_seo_data()           [gpt-4o-mini]   modules/seo.py         ← 1 call, returns excerpt + category
   → format_content_as_html()      [gpt-4o-mini]   modules/formatting.py
-  → generate_thumbnail()          [DALL-E 3]      modules/thumbnail.py
+  → generate_thumbnail()          [gpt-image-1-mini] modules/thumbnail.py
   → publish_to_wordpress()                        modules/wordpress.py
 ```
 
@@ -42,7 +42,7 @@ Input (URL or raw text)
 | fact_check | gpt-4o | Bilingual EN/ES comparison |
 | seo | gpt-4o-mini | Simple JSON output, low complexity |
 | formatting | gpt-4o-mini | HTML structuring, low complexity |
-| thumbnail | dall-e-3 | Image generation |
+| thumbnail | gpt-image-1-mini | Image generation |
 
 **Do not downgrade translation below gpt-4o** — the prompt has strict acronym formatting rules that smaller models drop.
 
@@ -107,4 +107,62 @@ Predefined in `modules/seo.py` prompt:
 
 ```
 openai / requests / python-dotenv / beautifulsoup4
+```
+
+---
+
+## Coding guidelines (Karpathy principles)
+
+Behavioral guidelines to reduce common LLM coding mistakes.
+
+**Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
+
+### 1. Think Before Coding
+
+**Don't assume. Don't hide confusion. Surface tradeoffs.**
+
+Before implementing:
+- State your assumptions explicitly. If uncertain, ask.
+- If multiple interpretations exist, present them — don't pick silently.
+- If a simpler approach exists, say so. Push back when warranted.
+- If something is unclear, stop. Name what's confusing. Ask.
+
+### 2. Simplicity First
+
+**Minimum code that solves the problem. Nothing speculative.**
+
+- No features beyond what was asked.
+- No abstractions for single-use code.
+- No "flexibility" or "configurability" that wasn't requested.
+- No error handling for impossible scenarios.
+- If you write 200 lines and it could be 50, rewrite it.
+
+### 3. Surgical Changes
+
+**Touch only what you must. Clean up only your own mess.**
+
+When editing existing code:
+- Don't "improve" adjacent code, comments, or formatting.
+- Don't refactor things that aren't broken.
+- Match existing style, even if you'd do it differently.
+- If you notice unrelated dead code, mention it — don't delete it.
+
+When your changes create orphans:
+- Remove imports/variables/functions that YOUR changes made unused.
+- Don't remove pre-existing dead code unless asked.
+
+### 4. Goal-Driven Execution
+
+**Define success criteria. Loop until verified.**
+
+Transform tasks into verifiable goals:
+- "Add validation" → "Write tests for invalid inputs, then make them pass"
+- "Fix the bug" → "Write a test that reproduces it, then make it pass"
+- "Refactor X" → "Ensure tests pass before and after"
+
+For multi-step tasks, state a brief plan:
+```
+1. [Step] → verify: [check]
+2. [Step] → verify: [check]
+3. [Step] → verify: [check]
 ```

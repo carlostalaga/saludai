@@ -23,12 +23,26 @@ DEBUG = True
 # Ensure a URL is provided
 if len(sys.argv) < 2:
     print("❌ Error: Please provide a URL to process.")
-    print("Usage: python main.py <url_or_text> [--dry-run]")
+    print("Usage: python main.py <url_or_text> [--dry-run] [--title \"Article Title\"]")
     sys.exit(1)
 
 # --dry-run flag: run all processing steps but skip WordPress publishing
 DRY_RUN = "--dry-run" in sys.argv
-url_or_text = next(arg for arg in sys.argv[1:] if arg != "--dry-run")
+
+# --no-thumbnail flag: publish to WordPress but skip image generation (saves ~$0.08/article)
+NO_THUMBNAIL = "--no-thumbnail" in sys.argv
+
+# --title flag: override the extracted title
+OVERRIDE_TITLE = None
+if "--title" in sys.argv:
+    title_index = sys.argv.index("--title")
+    if title_index + 1 < len(sys.argv):
+        OVERRIDE_TITLE = sys.argv[title_index + 1]
+
+url_or_text = next(
+    arg for arg in sys.argv[1:]
+    if arg not in ("--dry-run", "--title") and (OVERRIDE_TITLE is None or arg != OVERRIDE_TITLE)
+)
 
 # -----------------------------------------------------------------
 # STEP 0: DEBUG/VERIFICATION BEFORE PROCEEDING
@@ -102,6 +116,10 @@ if DEBUG:
 # format_content_as_html now returns the title and the formatted body separately
 article_title, formatted_html_body = format_content_as_html(final_checked_text)
 
+if OVERRIDE_TITLE:
+    article_title = OVERRIDE_TITLE
+    print(f"ℹ️ Using provided title: {article_title}")
+
 if DEBUG:
     print(f"[DEBUG STEP 4.5: EXTRACT TITLE] Extracted Article Title: {article_title}") # New debug output
     print("[DEBUG STEP 4.5: FORMAT CONTENT AS HTML] Formatted HTML Body (first 500 chars):") # Updated label
@@ -118,6 +136,6 @@ if DRY_RUN:
     print(f"📌 Category: {category_name} (ID: {category_id})")
     print(f"\n--- HTML Body (first 1000 chars) ---\n{formatted_html_body[:1000]}\n...[truncated]...")
 else:
-    publish_to_wordpress(article_title, formatted_html_body, excerpt, category_id)
+    publish_to_wordpress(article_title, formatted_html_body, excerpt, category_id, skip_thumbnail=NO_THUMBNAIL)
     print(f"✅ Process completed successfully! Published with title: {article_title}")
     print(f"📌 Assigned Category: {category_name} (ID: {category_id})")

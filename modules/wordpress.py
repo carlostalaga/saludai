@@ -109,14 +109,17 @@ def upload_thumbnail(image_url):
         print(f"❌ Unexpected error in thumbnail upload/download: {e}")
         return None
 
-def publish_to_wordpress(title, content, excerpt, category_id):
+def publish_to_wordpress(title, content, excerpt, category_id, skip_thumbnail=False):
     """
-    Publishes content to WordPress with an SEO title, excerpt, 
-    and assigned category. Also attempts to generate & upload a thumbnail.
+    Publishes content to WordPress with an SEO title, excerpt,
+    and assigned category. Pass skip_thumbnail=True to skip image generation.
     """
-    # Generate a thumbnail and upload it
-    image_url = generate_thumbnail()
-    media_id = upload_thumbnail(image_url) if image_url else None
+    if skip_thumbnail:
+        media_id = None
+        print("ℹ️ Skipping thumbnail generation (--no-thumbnail).")
+    else:
+        image_url = generate_thumbnail()
+        media_id = upload_thumbnail(image_url) if image_url else None
 
     post_data = {
         "title": title,
